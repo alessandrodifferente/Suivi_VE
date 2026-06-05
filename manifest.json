@@ -1,8 +1,8 @@
 {
-  "name": "Suivi voiture électrique",
+  "name": "Suivi VE Cloud",
   "short_name": "Suivi VE",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#0f766e"
+  "theme_color": "#0f766e",
+  "background_color": "#f8fafc"
 }
