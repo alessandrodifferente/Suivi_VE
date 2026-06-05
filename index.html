@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Suivi voiture électrique</title>
+<meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--muted:#64748b;--line:#e2e8f0;--green:#16a34a;--teal:#0f766e;--blue:#2563eb;--red:#dc2626;--shadow:0 10px 30px rgba(15,23,42,.08);--radius:22px}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#ecfeff,#f8fafc);color:var(--text)}
+.wrap{max-width:1150px;margin:auto;padding:16px 12px 80px}
+header{background:linear-gradient(135deg,#064e3b,#0f766e,#16a34a);color:white;border-radius:28px;padding:18px;box-shadow:var(--shadow)}
+.hero{display:flex;gap:16px;align-items:center}.logo{width:92px;height:92px;border-radius:24px;background:white;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.15)}
+h1{margin:0;font-size:clamp(25px,4vw,38px)}.sub{color:#dcfce7;margin:5px 0 0}
+.tabs{display:flex;gap:8px;overflow:auto;position:sticky;top:0;background:rgba(248,250,252,.92);backdrop-filter:blur(8px);z-index:10;padding:12px 0 4px}
+.tab{border:1px solid var(--line);background:white;border-radius:999px;padding:10px 14px;font-weight:800;white-space:nowrap}.tab.active{background:#0f766e;color:white}
+.card{background:white;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-top:14px}
+.grid{display:grid;gap:14px}.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:850px){.grid2,.grid3,.grid4{grid-template-columns:1fr}.logo{width:76px;height:76px}}
+label{display:block;font-size:13px;color:var(--muted);font-weight:800;margin:10px 0 6px}
+input,select{width:100%;border:1px solid var(--line);border-radius:14px;padding:12px;font-size:16px}
+button{border:0;border-radius:16px;padding:12px 14px;font-weight:900;font-size:15px;cursor:pointer}
+.primary{background:#0f766e;color:white}.secondary{background:#f1f5f9}.danger{background:#fee2e2;color:#991b1b}.success{background:#dcfce7;color:#166534}.blue{background:#dbeafe;color:#1e40af}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.hide{display:none!important}.muted{color:var(--muted)}
+.stat{background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:0 4px 16px rgba(15,23,42,.05)}.stat .k{color:var(--muted);font-size:13px;font-weight:900}.stat .v{font-size:27px;font-weight:950;margin-top:4px}
+.notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:18px;padding:12px;font-weight:750}.ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;border-radius:18px;padding:12px;font-weight:750}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:800px}th,td{border-bottom:1px solid var(--line);padding:10px;text-align:left}th{font-size:12px;color:var(--muted);text-transform:uppercase}.scroll{overflow:auto}
+.pill{display:inline-block;background:#f1f5f9;border-radius:999px;padding:7px 10px;font-size:13px;font-weight:800}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="hero">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAYAAAB/HSuDAAA6h0lEQVR4nO3dva4j2ZUm0GAhjXZ6JGBQI3Q7begdBuWUVab0CGkoIUtWOnoMOWnJElJA5yNIZlrlFPQO444gFBqjH0dWc4ysW3UvL8kbPyfi7LP3WsAA3UCPxLwkg+f79g7ydD6fJwAAACC3z3o/AAAAAGB/CgAAAAAoQAEAAAAABSgAAAAAoAAFAAAAABSgAAAAAIACFAAAAABQgAIAAAAAClAAAAAAQAEKAAAAAChAAQAAAAAFKAAAAACgAAUAAAAAFKAAAAAAgAIUAAAAAFCAAgAAAAAKUAAAAABAAQoAAAAAKEABAAAAAAUoAAAAAKAABQAAAAAUoAAAAACAAhQAAAAAUIACAAAAAApQAAAAAEABCgAAAAAoQAEAAAAABSgAAAAAoAAFAAAAABSgAAAAAIACFAAAAABQgAIAAAAAClAAAAAAQAEKAAAAAChAAQAAAAAFKAAAAACgAAUAAAAAFKAAAAAAgAIUAAAAAFCAAgAAAAAKUAAAAABAAQoAAAAAKEABAAAAAAUoAAAAAKAABQAAAAAUoAAAAACAAhQAAAAAUIACAAAAAApQAAAAAEABCgAAAAAoQAEAAAAABSgAAAAAoAAFAAAAABSgAAAAAIACFAAAAABQgAIAAAAAClAAAAAAQAEKAAAAAChAAQAAAAAFKAAAAACgAAUAAAAAFKAAAAAAgAIUAAAAAFCAAgAAAAAKUAAAAABAAQoAAAAAKEABAAAAAAUoAAAAAKAABQAAAAAUoAAAAACAAhQAAAAAUIACAAAAAApQAAAAAEABCgAAAAAoQAEAAAAABSgAAAAAoAAFAAAAABSgAAAAAIACFAAAAABQgAIAAAAAClAAAAAAQAEKAAAAAChAAQAAAAAFKAAAAACgAAUAAAAAFKAAAAAAgAIUAAAAAFCAAgAAAAAKUAAAAABAAQoAAAAAKEABAAAAAAUoAAAAAKAABQAAAAAUoAAAAACAAhQAAAAAUIACAAAAAApQAAAAAEABCgAAAAAoQAEAAAAABSgAAAAAoAAFAAAAABSgAAAAAIACFAAAAABQgAIAAAAAClAAAAAAQAEKAAAAAChAAQAAAAAFKAAAAACgAAUAAAAAFKAAAAAAgAIUAAAAAFCAAgAAAAAKUAAAAABAAQoAAAAAKEABAAAAAAUoAAAAAKAABQAAAAAUoAAAAACAAhQAAAAAUIACAAAAAApQAAAAAEABr3o/AABgntPH1+fej+GW81cfTr0fAwBw3+l8DnuWAIB0Iof4XpQHAHAMBQAANCDY709RAADbKAAAYAYBPz4FAQDcpwAAgO9ED/mRA66/HQDEpwAAoJyeYVUQfc7zAQDHUAAAkNqR4VKY3I/nEQC2UwAAkMIRAVEwjMvzDwAvUwAAMKS9Ap+Ql4/XCgB8ogAAILzWAU5w44HXFgCVKAAACKdlKBPIWMrrD4CsFAAAdCVsMQKvUwAyUAAAcLgWYUqIojevYwBGowAAYHdbg5KQxCi81gGITAEAQHNCEHzivQBAJAoAAJrYEnSEHKrwPgGgJwUAAKsIMrCd9xEAR1IAADDb2rAiqMA83mMA7EkBAMBdAgn04b0HQGsKAACeWRM8hA7Yl/clAFspAACYpkm4gJF4vwKwhgIAoLClIUKAgJi8lwGYQwEAUIygALl5jwNwiwIAoACBAGry3gfgMQUAQFIO/sBjrgkAKAAAkllyyHfAh5pcJwBqUgAAJOAwD6zl+gFQhwIAYGAO7kArricA+SkAAAbjkA7szXUGICcFAMAg5h7IHcaBllx7APJQAAAEZgoHROF6BDA+BQBAQCZuQGSuUQBjUgAABOJQDYzENQtgLAoAgM4coIEMXMsA4lMAAHTisAxk5NoGEJcCAOBgDsdABa51APEoAAAOMucw7CAMZOT6BxCDAgBgZw6+AJ+4HgL0pQAA2ImDLsB1ro8AfSgAABpyzyvAfK6ZAMdSAAA0YJoFsI3rKMD+FAAAGziwArTlugqwHwUAwAoOqAD7cp0FaE8BALDQS4dSB1KAdlxzAdpRAADM5BAK0I9rMMB2CgCAFzh0AsThmgywngIA4AaHTIC4XKMBllMAAFxwqAQYh2s2wHwKAIDvOEQCjMs1HOBlCgCgPIdGgDxc0wFu+6z3AwDoyUERIJeXrtsvXfcBMrMBAJQk+APk51oP8JQCACjFYRCgHtd+gE8UAEAJDn8A+CwAqlMAAOndO/A57AHU43MBqEoBAKRl0gPALT4jgIoUAEA6DnUAzOUzA6hEAQCkYq0TgDV8fgAVKACAFBzcAGjB5wmQmQIAGJrVTQBa89kCZKUAAIZlSgPAnnzOANkoAIDhmMwAcBSfOUAmCgBgKKYxAPTg8wfIQAEADMHBC4AIfB4BI/us9wMAeInDFgBR3Pvceel2AYDebAAAYQn+AETmcwoYjQ0AICSHKgCisw0AjMYGABCK4A/AiHx+ASOwAQCE4fAEwKhsAwAjsAEAdCf4A5CJzzUgKhsAQFcOSQBkYxsAiMoGANCF4A9ABT7vgEhsAACHcxgCoArbAEAkNgCAQ9067Aj+AGTnMxDoTQEAHMLUHwB8HgJ9KQCA3Zl4AMBTPhuBHnwHALArBxwAeO7W56DvBQD2ZAMA2IUVRwB4mc9L4EgKAKA5U38AWMZnJ3AEtwAATTnAAMBybgkAjmADAGjCCiMAbOfzFNiTAgDYzNQfANry2QrswS0AwCYOKADQnlsCgD3YAABWsaIIAPvzeQu0pAAAFjP1B4Bj+ewFWnALALCIAwgAHM8tAUALCgBgNuEfAPpRAgBbuQUAeJHgDwCx+GwG1rABANzlgAEA8dgGANZQAAA3Cf8AEJcSAFhKAQBcJfwDQHxKAGAJ3wEAPHPt0CD4A0BsPr+BlygAgO+Z+gPA2HyWA/e4BQCYpsmBAQAycEsAcI8CABD+ASARJQBwiwIAihP+ASAfJQBwje8AgMJ8WRAA5OfzHnhgAwCKchgAgBqufb7bBICabABAMVb+AaAmZwDABgAU4oMfAOryvQCAAgCKEP4BACUA1KYAgAKEfwDggRIA6lIAQHLCPwBwSQkANfkSQEjMN/0DAC9xXoA6bABAUj7MAYA5/Ewg1KEAgISEfwBgCSUA1KAAgGSEfwBgDSUA5KcAgESEfwBgCyUA5KYAgCSEfwCgBSUA5KUAgASEfwCgJSUA5KQAgMEJ/wDAHpQAkM/pfPYehhHd+gAW/gGAlpw5IA8bADAgH8QAwFFunS9sA8B4FAAwGOEfADiaEgByUADAQIR/AKAXJQCMTwEAgxD+AYDelAAwNgUADED4BwCiUALAuBQAEJzwDwBEowSAMSkAYEDCPwDQm/MIjEcBAIFda9F92AIAUVw7l9gCgLgUABCU8A8AjEAJAONQAEBAwj8AMBIlAIxBAQDBCP8AwIiUABDf6Xz2noQohH8AYHRRzzM/+fCzZsHnL6//2P3fA2soACCIqB+WAABL9TrXtAz5aykHiEwBAAEI/wBANkecbyIE/pcoBIhEAQCdCf8AQFatzzkjBP6XKAToSQEAHQn/AEB2W887GUL/LcoAjqYAgE6EfwCgiqXnnsyh/xZlAEdQAEAHwj8AUM1L55+Kof8WZQB7UQDAwYR/AKCqa+eg//Xn/9fjoQxBEUBrCgA4kPAPAFT3cB4S/OdTBNDKq94PAAAAqEPwX+7h9ghFAFvZAICDmP4DAJW5x78dRQBrKQDgAMI/AFCV4L8fRQBLKQBgZ8I/AFCR4H8cRQBzfdb7AUBmwj8AUJHwfyx/b+ayAQA7Ef4BgGoE0f5sA3CPDQDYgfAPAFQj/MfgeeAeGwCwg8sCQPgHALISOOOyDcAlGwDQ2LXpPwBARsJ/bJ4fLikAoCGr/wBAFcLlGDxPPOYWAGhE+AcAKhAox+WWAGwAQAPCPwBQgfA/Ns8fCgDYSPgHACoQHnPwPNamAIDGhH8AIBuhMRfPZ10KANjAN/4DANkJizl5XmtSAMBKVv8BgOyExNw8v/X4FQBYQfgHADITDOvxCwE12ACAhYR/ACAz4b8mz3sNCgDYSPgHALIQAmvz/OenAIAFfOkfAJCV8Mc0eR1kpwCAmaz+AwAAI1MAwAzCPwCQmakvj3k95KUAgBWEfwAgC2GPa7wuclIAwAvc9w8AZCXkcY/XRz4KALjD6j8AkJVwxxxeJ7koAOAG4R8AyEqoYwmvlzwUADCT8A8AZCDMsYbXTQ4KALjCff8AAEA2CgC4YPUfAMjKFJctvH7GpwCAR4R/ACAr4Y0WvI7GpgCAO4R/ACADoY0Hf3n9xz9v/c/wehqXAgC+475/AAAq+MvrP/65RRHAeE7ns8wDVv8BgKxMa3lwK/T/5MPP/m3lf57z8mBsAFCe8A8AZCX8M8fajQCvr/EoAOCC8A8AQDZzAr5bA/JTAFCa+/4BgKxMZ1lrSRHgdTYWBQBlWf0HALISynhs76m+19s4FADwHeEfAAA+WfvFgMSmAKAkq/8AQFamsTx21D39XndjUABQjtV/AAC4zfQ/LwUA5Qn/AEAWprA8dvQ3+nv9xacAoBSr/wAAcJvpf24KAMqw+g8AZGb6ymNHT/8feB3GpgCgLOEfAAB+YPqfnwKAEqz+AwCZmbryWK/p/wOvx7gUAKRn9R8AAO4z/a9BAUA5wj8AkIlpK4/1nv4/8LqMSQFAalb/AQDgPtP/OhQApGX1HwDIzpSVx6JM/x94fcajAKAM4R8AAJ4y/a9FAUBKVv8BgOxMV3ks2vT/gddpLAoA0rH6DwAALzP9r0cBQHrCPwAAmUWd/hOPAoBUrP4DABVYq2arI6f/Xq9xKABIzfQfAADgEwUAaZj+AwBQzZr1f/f+16UAIAVf/AcAVGGdmhF53cagACAl4R8AgOxM/1lKAcDwrP4DAAC8TAFAOqb/AEBW1qh5MOJP/3n99qcAYGiX03/hHwAArrP+jwKAYVn9BwCgohGn/8SgACAN038AIDPr02wRZfrvddyXAoAhmf4DAFCR6T9bKABIwfQfAACuizL9pz8FAMMx/QcAoCLTf7ZSADA8038AIDv3TbNWxOm/13M/CgCG4mf/AACoyPSfFhQADMPqPwAAzBdx+k9fCgCGZfoPAEAFpv+0ogBgCKb/AAAwn+k/1ygAGJLpPwBQhS9Mqy3r9N/rug8FAOGZ/gMAwHym/9yiAGA4pv8AAFSQdfpPPwoAQjP9BwCA+Uz/uUcBwFBM/wEAqMD0nz0oAAjrcvov/AMAwG2m/7xEAQAAABCI6T97UQAQkuk/AADMZ/rPHAoAAAAIym+lk5nX9/EUAIRj+g8AQFVr1v9N/5lLAUAofvYPAABgHwoAQjP9BwCgCtN/9qYAIAzTfwAAgP0oAAjL9B8AgCr89B9HUAAQguk/AAAsY/2fpRQAhGT6DwBAFab/HEUBQHem/wAAsIzpP2soAAjH9B8AgCpM/zmSAgAAAGAgpv+spQCgq8v1f9N/AACqMP3naAoAAACAQZj+s4UCgG5M/wEAqMr0nx4UAAAAAAMw/WcrBQBdmP4DAFCV6T+9KAAAAACCM/2nBQUAh7uc/gMAQBWm//SkAKA76/8AAHCb6T+tKAA4lOk/AABVmf7TmwKArkz/AQBu+8vrPzorFZd5+u/1fTwFAIcx/QcAoCrTfyJQANCN6T8AANyWefpPHwoAAAAAKEABwCEu1/9N/wEAqGLN+r/pP3tQAAAAAEABCgB258v/AACoyvSfSBQAHM76PwAAwPEUAOzK9B8AYBu/lT4uP/13m9d1HwoADmX6DwAAt1n/Z08KAAAAgMZM/4lIAcBu/PQfAADMZ/rP3hQAAAAADZn+E5UCgF348j8AgHZ8YVp+lab/Xs/9KAA4hPV/AAAqMP0nMgUAAABAR5Wm//SlAKA5X/4HAEBFpv9EpwAAAIABuG86p2rTf6/jvhQANOXL/wAAqMj0nxEoANiV9X8AALiu2vSf/hQAAAAwCOvTMZn+z+P1258CgGZ8+R8AAMxj+k8PCgAAAICVTP8ZiQKAJnz5HwDAMaxRj6/i9N/rNgYFALuw/g8AQHam/4zmVe8HAABLnN68tXEEC5zfv1PKB/Gj3/580/Xrb7/6g+cygYrTf+JQALCZ9X/gKMI/LHd68/asBDjW1qA/7z/3h6f0X/7VpZHYrP/HoQCgOev/AEAlewX+uf75j6dHL4XAMdas/5v+05sCAIAhmP7DerYA2usd+u95XAgoA4DHFABscrn+b/oPAGQVOfTfogzYh+n/fNb/Y/ErAACEZ/oP23kfrfej3/78PGL4v/TPf5ye3S4A1GIDAACgCLcCzJch8N9iK2AbP/03n+l/PAoAVrP+DxzB1BI4Uubgf81DGaAI2FfV9X/icQsAAEAhSrXbqoX/x9waMI/p/3ym/zEpAAAIS1CBfXhvPZXlHv+tfEfAPkz/icQtAKxi/R8AGJ3Qf53bAq4z/Z/P9D8uGwAAhGRCCfuq/h4T/l9mG2A703+isQEAAEAZgv8ytgE+Mf2fz/Q/NhsALGb9H9hb9ckkHKXae034X882wHKm/0SkAAAglGqBBHqr8p4T/rerWgKY/s9n+h+fWwAAAEhL8G/LLQHzmP4TlQ0AFrH+D+ypyiQSosn63hP+91NlG8D0fz7T/zEoAAAASEf431+VEmAp038iUwAAEELWCSSMItN7UPg/TuYSwPR/PtP/cSgAmM36PwDklqEEEP6Pl7kEWKri9F/4H4sCAIDuMoQOoD/hv59sJYDpP1kpAAAA+N6ohZzw31+2EmAp039GoABglsv1f4BWRg0bQBzCfxwZSgDT/3mE/zEpAFjF/f8AkNdIxZzwH0+GEmCpitN/xqQAAKCbkUIGVOP9Cdxi+j8uBQAAAEMy/Y9r1C2ANev/1ab/wv/YFAC8yM//AXswXYT4Ir9Phf/4Ri0BuE34H58CAIDDRQ4VwFMR36/C/zhGKgFM/6lAAQAAwDCE//GMVAJwm+l/DgoA7vLzf0BrEaeJwH3etzX87Vd/KPvzd6b/9wn/eSgAWMT9/wBAL6b/+3kI/3uVALYAxiX85/Kq9wMAoI6IU8S//u43vR8CrPLjX/760P++05u35/P7d92CgPB/nIcS4Ee//XnTCfc//3Ga/uVf4z2Na6b/VQj/+dgAAKAs4R+WiVjisd2tqX/lWwJeUmH9X/jPSQHATX7+D2hJcIC2KhVYpv/9/O1Xf/hzyyIg2q0Apv/XCf95KQAAKKlSeIKWlHm5zA33tgF+UGH6T14KAAB2JzDAPioUWab/+1kS6lt+H0CULQDT/+tM/3NTAABQToXQBHtS6lFV9um/8J+fAoCr3P8PtBItKAj/ZNPrNX3Ee9v0fz+9pv8Pem8BmP4/J/zX4GcAAQCgEPfzr5N1+i/412IDAIDdmP7DMTJuAZj+x7DH9P9Bry0A0/8fCP/1KAB45nL9HwCAHHqv/o8q4/Rf+K9JAcCL3P8PrGH6D8fKtAVg+l/H0VsApv+fCP91KQAAaE74h1qivee5zvR/nWzTf+G/NgUAAEASGcou0/99RA7/R20BmP4L/ygAAGgs2iQwQyCCEUR770MLWab/f3n9x5PwzzQpALhw+QWA7v8HgLH0LL2UADFFnv4fpfL0/7//4796PwQCUQAA0Ey0w7/pP4zF+n97S8J/T71+EvCeDNN/4Z9LCgAAgGRsAbCG6X8e//0f/yX8c5UCAIAmoh36Tf+B6qz+rzfy9N+9/tyjAOB77v8HshD+YbwtAOv/RLwNYCSPv+jv2y+/efLH/PzrL7y/mKZJAQBAA9Gm/0B/rgt9mf5/smb9f8Tpv6k/cykAAEjF9B9+4P1Qk/Bfh5/3YykFAACbmPIBt7g+0FPm6b/gz1oKAADSMO2E50Z4X7j/v53Rp/++B+A+wZ+tFABM0+QLAIF1Ik33Rgg5UFGk60R2S8J/dtl++m9N8PdFgFyjAABgFYd6GEfvgsz1Ip6I0//eIq7/m/jT2qveDwAAtuodbgB6G331v6UM03+hn73YAABgMdM8GE/vosx1g7l6hN8I0/+Hab/wz55sAPDs/n+AkfQONQC9ZZz+Pw7BP/nws9ln1dGm/0eH/c+//uJ8+d0A1HI6n2W/6nwBILBEpCme8A/L/fiXv+76339+/+7JOcMvAGyTMfxP0zT97Vd/uHoefakMGOGn/3qE/sf/uwKgNhsAAAAc5vTm7fmyBIC5LsPz40Ig6vTfSj+RKAAAmM30H8b319/9pvsWAG1knf4vcRGu/+/S//97TP8FfiJTAAAAcChbANstCf9FLA7/Wwj5jEoBAMAspv+QR4QtACXAcbJO/xv497+8/mPvxwCH8jOAxfkCQGA0wj9QndX/Zw6d/o/m8kv/Lr8UkFoUAAC8KNL0H2gjQpnm2kJH/977AUAPCgAAhhEhsAD0ZPr/jOk/LKAAAOAuEzrIK0Kp9vc//bT3QxiG8N+M6T9lKQAAuClS+I8QVIB9KAFYyfQfFlIAFOYLAIFRCP+wH++vMZj+N1Ny+u+LAHmgAADgqkjTfyA/WwAsZPoPKygAAAjNdBL2530Wm+l/MyWn//CYAgCAZ0z/gR5sATwn/AMtKQAACMtUEo4T5f2mBGCGNev/pv8wKQAAuGD6DxCD6T/QmgKgqMtfAACIJso0EiqJ8r6zBSD832H634hfAqhJAcA0TX4CEPgkyvQ/SggB+lEC1PW3X/3BuXQHlz8FSE0KAAAAvqeA68/0/yY//QcbKQAAmKbJ9B+IxxYADVj/h0cUAAAAPKGI68f0/ybTf2hAAQCA6T8QVqUtAOG/OdN/uKAAAChO+AeuifSerFQCcJXpPzSiACjITwACAMRi+v9Jw18AMP2fwU8B1qMAwE8AQmGm/8A9kd6bmbcAloT/gkz/G/JTgCgAAABgEJmn/w2Z/sMNCgCAokz/gTkivUczbgFY/b/L9B8aUwAA0E2kYAGMIWMJwCeN7v83/Yc7FAAABUWZ/gNjUNbtw/T/LtN/2IECAIAuBApgrQxbAML/Lkz/4QUKAIBiTP+BNZR27Oli/d/0H3aiACjm9PG1gz/QnSABbDXyFoDp/y5M/1f6/Osv5INCFADFnb/64LdAoZAI03/hH8YV7f07YgmwJPwXZfq/s2+//Mb5vzAFAAAABFRl+t/g2/9N/2EmBQBAEab/QAvR3scjbQFY/X+R6T/sTAEAUECE8A+wl5FKAJ4y/YdjKQAAOES0qSGwnvfzcqb/QAQKAIDkTP+BCiJvAQj/1zX46T/Tf1hIAQDA7kwLIR/va4DxKAAAEosw/RcSgKNE3AIw/b/O9B/6UAAAALBKxIIvUgmwJPwDHEEBUMjp4+snk8DzVx+2fusqEJjpP8A4TP850rdffvMkB3z+9RfdzwwcQwEAAMBqEYu+CFsAVv93Zf0fVlIAACRk+g9ARKb/0JcCAIDmhH+oJeJ7vucWgOn/rkz/YQMFAEAyEab/ABH0KAGE/9tM/6E/BQAATUWcBAL7897nnovwv5bpP2ykAABIxPQf4KkjtwBM/2cz/YdOFAAANGMCCLVVvgYsCf/VmP5DHAoAgCR6T/8rH/yB2CL8LOBjlab/V8K/6T90pAAASKB3+Ad4ELUM3LMEsPp/XaPJ/zSZ/kMzCgAANot64Aegjxvh3/QfOlMAAAzO9B+IJmopuMcWgOn/7kz/oSEFAACbRD3oA1zTugSYG+orhX/Tf4hLAQAwsN7Tf+EfuKXS9eFHv/35v1UK+Pc0vO9/mkz/oTkFAAAApez1hYC3SoAq5cCd8G/6D0EoAIo4fXz9ZEp4/upDy3YW6MD0H4iu4nWi6jZA48n/NJn+7+7bL7958px9/vUXvlOoAAUAAADl7PmzgNP0w9S/QhnwQvg3/YdAFAAAAzL9B0YR+XpxVAmQ2Q6T/2ky/YfdKAAAWCTyYR6A48wI/6b/EIwCAGAwvaf/AEtFLg733gLIaqfJ/zSZ/sOuXvV+AACMI/IhHoD97Rj8gQPYAAAYiOk/MKrIBaItgHkWhv816/+m/7AzBQDAIHqH/8iHd4CtlAD3mfxDDgoAAAAOoUgcz99+9YfTivBv+g9BKQAABmD6D7A/WwBPmfpDPgoAAO4S/oGWXFPiWzn1f+Cn/yAwvwIAEFzv6T9AJX//00+n//G//0/vh9FFx4m/9X84iA0AAG4yqQP2EP3aUvFWgEbh3/QfgrMBABCY6T8Aewpwn7/pPxxIAQDAVdEndMDY/vq730w//uWvez+Mm/7+p59O5/fvTtM0TT/67c9TlbE7hX7TfxiAWwAAguo5/Rf+AX64Dm/8UrwwAv47TP/hYDYAAADoIvoWwKXH4XmUrYCDAr/pPwxCAQAQkOk/QAynN2/PD7cCPBa5DAg25b/F9B86UAAAANDNaFsA11wG7qMLgc6B3/QfBqIAAErzLftPmf4DPHdrC+CWW4F8azEwyGR/DtN/6OR0Pjv7VnD6+PrJE33+6kOWDxBYROAHYIslRUABa6f/CoAgPv/6iyfnom+//MbrOzkbAEB6Qj8ArTz+TFEGrCL8Q0cKACAloR+AvRUvA9z7DwNSAACpCP4A9PDw+VOwCFjC9B86UwAAKQj+AERQpAgw/YdBfdb7AQBsJfwDEI3PpmdM/yEAGwDAsByuAIgs6TaA6T8MzAYAMCThH4BR+Mwy/YcoFADAcBykABhNos+uf58EehiWWwCAYSQ6PAFQULJbAh5KgJduCVAWQCA2AIAhCP8AZJHsM81GAAxEAQCEl+ygBAAZP9uuFQGKAQhGAQCElvCABADTNKX9jLMRAIEpAAAAgNaUABCQAgAIK+lkBAC+57MOOJICAAjJgQiAKnzmAUdRAADhOAgBUI3PPuAICgAAAAAoQAEAhGICAkBVPgOBvSkAijh/9eH0+H8/fXztA4ZwHHwAqM5nIUf5/OsvnrzWvv3ym9Ot/1vyUAAAAABAAQoAIAQTDwD4xGcisBcFAAAAABSgAAC6M+kAgKd8NgJ7UAAAAABAAQoAAAAAKEABAHRlxREArvMZCbSmAAAAAIACFAAAAABQgAIA6MZqIwDc57MSaEkBAAAAAAUoAAAAAKAABQAAAAAUoAAAunBPIwDM4zMTaEUBUMj5qw+nx//76eNrHyYAAFDM519/8SQHfPvlN6db/7fkogAAAACAAhQAAAAAUIACAAAAAApQAAAAAEABCgAAAAAoQAEAAAAABSgAAAAAoAAFAAAAABSgACju9PH1ufdjAAAAjvH51184/xemACjm/NWHU+/HAAAAxPDtl9/IB4UoAAAAAKAABQAAAAAUoAAAAACAAhQAAAAAUIACAAAAAApQAAAAAEABCgCm08fXfgsUAACS+/zrL5z7i1MAFHT+6oPf+gQAgOK+/fIbuaAYBQAAAAAUoAAAAACAAhQAAAAAUIACAAAAAApQAAAAAEABCgCmafJTgAAAkJmfAGSaFABl+SlAAACoy08A1vSq9wMAYLnz+3e7/uef3rzd9T8fGJNrD8DYFAAAwex9wG71GBzUIRfXHoD8FAAAnUQ4bG9x6/E7nENsrj0AdSkAAA4y+qF7rst/p0M59OXaA8ADBQDATqocul/iUA7Hcu35xLUH4LnT+ezXICq7/Pk/vw7AUU5v3qa8+Dh4L+NADm249iwz4rXn/P6dMxqrXf4EoF8AqMsGAMBGDt7rPf7bjXggh55ce9Zz7QGqUgAArODg3Z4DObzMtac91x6gEgUAwAIO38d4+Ds7jMMnrj3HcO0BslMAAMzg8N2HwzjVufb04doDZOVLAPFFgHQxypcAOnzH4jBOFa49sUS49vgSQNbyBYA89lnvBwAQlQN4PJ4TKvA6j8dzAmThFgCACw56sVnNJSvXnthce4AMbAAAPOIAPg7PFZl4PY/DcwWMTAEA8B2HuvF4zsjA63g8njNgVG4B4JnTx9dnXwRIJQ5yY7OWy6hce8bm2sMILr8AEGwA4Fv/Kc0BPA/PJSPxes3Dc8lI/AIACgAAAAAoQAEAlGVqk4/nlBF4nebjOQVGoQAASnJYy8tzS2Ren3l5boERKACYpun59wCcPr72hSGk5ZCWn+eYiLwu8/McE8nlFwC6/59pUgAAAABACQoAAAAAKEABAJRiPbMOzzWReD3W4bkGIlMAAAAAQAEKAL7niwABAGB8vgCQWxQAAAAAUIACAAAAAApQAAAAAEABCgCe8D0AZHd687b3Q+Agnmsi8Xqsw3NNb+7/5x4FAAAAABSgAAAAAIACFABAOdYz8/McE5HXZX6eYyA6BQAv8j0AZOSQlpfnlsi8PvPy3BLB5f3/cEkBwDOXXwQIWTms5eM5ZQRep/l4TonKFwBySQEAAAAABSgAgNJMbfLwXDISr9c8PJfASE7ns9tEuO7y3n+3BtDS6c3bcBef8/t3vR8CKzh8MzrXnjEdfe05v3/nHMZdl/f/W//nGhsAAN8RJMfjOSMDr+PxeM6AUSkAAB5xqBuH54pMvJ7H4bkCRvaq9wMAiObhcGctNyaHb7Jy7YnNtQfIwAYAN13e83/5nQCQncNePJ4TKvA6j8dzQnTu/2cuGwAAd5jIxeDwTTWuPTG49gDZKAAAZnAY78Phm+pce/pw7QGyUgCwyOnj67OfA6Qyh/FjOHzDU649x3DtYUSX6/9wjwKAu85ffTi59x+ee3xIdCBvw8EbXuba055rD9m4/597FAAAGzmQr+fgDeu59qzn2gNUpQAAaMiB/GUO3tCea8/LXHsApul0Ptvu5mWXtwH4HgC2Or15W+7iU/VQ7tANfbn25HB+/87Zi2f8/B9L2QAAOMjlYTTroTzboRtG59oDwAMFAEAntw6roxzOHbZhTK49AHUpAFjFzwHCfuYcbvc+qDtgQz2uPTAWP//HGgoAZvFzgBCLQzLQg2sPxOX+f+b4rPcDAAAAAPanAAAAAIACFADMdnnPv1sCAADgeH7+j7UUAAAAAFCAAgAAAAAKUACwiNsAAACgH+v/bKEAAAAAgAIUAAAAAFCAAoDF3AYAAADHs/7PVgoAAAAAKEABAAAAAAUoAFjFbQAAAHAc6/+0oAAAAACAAl71fgAAENn5/bvv/+fTm7cdHwlH8ZwDkJUCgNXOX304PV79P318fb68NQBgNI/DHygDgAis/9OKAgCA8uaG/vP7d0JgcvdeC8oAAEbnOwAAABayKQLAiBQAbOLXAIAMlkxzBb+8ljy3NgCAo1j/pyUFAAAAABSgAKA5WwDAiGwB1Gb6D0R0Of2HrRQAbOab/4GKlAB5eC6BUVj/ZysFAAB8x2SXl3iNADAyBQC7cBsAUIHJ8fg8h0BU1v/ZgwKAJtwGAGSxdMIrQI5r6XNn+g/0ZP2fFhQAAHBBCZCf8A9ARQoAmrncAnAbAFDJ+f07RcAAPE/ACC7X/03/aUUBAABXrJ34CpdxrX1uTP8ByEIBwK5sAXDL+f07TTbhKQHyEP4Zmc/MWnz5H3tSANCULwMEstlSAigC+tvyPAj/QATW/2lJAQAAL9gSBBUBfWz9uwv/AGSkAKA5XwYIZLQ1ECoCjtHi7yz8A7348j/2pgAAunFPI6NpEQwVAfto9XcV/onGZyXQkgKAQ9gCALJoFRAVAW20/DsK/0BPvvyPI7zq/QDI6fzVh5PQD2T1EBRbBM+H/wzhc5mW5Ym/PRCR9X/2cDqfZTT2cVkA+IUAbjm9eetCxLD2mOILpNf5W1ON9f9a3P/PERQA7EoJwBwKAEa35yp/9YDqb0tlCoA6hH+O4hYAANio5S0Bly7/M7OH1iO+FyH73xAAbrEBwK6ufQ+ALQCusQVAJkd+ud/oYdbfCq4z/a/j2pf/2QBgLzYA2JUvAwQqOr15e1iwvfbfEzXo9vzVg6h/E4BLwj97sgHA7mwBMJctADKK+FN/e4XhSv9W2JPpfx2m/xzNBgC7swUAVLbn9wOsFemx7EXwB0Yk/LO3z3o/AIAHJh5kdnrzVig9gL8zo/NZCOzJLQAcxk8CMpdbAaiiwiT+CAI/WQj/tfjpP3pwCwAAdBLx9oCRCP4AsIwNAA7jywBZwhYAVSkD7hP6ycr0vxZf/kcvCgAO5TYAllACUJ0y4BOhn+yE/3qs/9OLAoBD2QJgKSUA/KBKISDwU4nwX4/pPz35DgAO5ScBAda7DMZZCgGBH6hM+OdINgA4nC0AlrIFAMtELQYEfXjK9L8e0396UwDQhe8CYCklALSzV0Eg4MMyCoB63PtPb24BAIZwfv/upASANgR1AKjps94PgJouJ/6+F4A5zu/fnUxLAIARmf4TgQIAGI4SAAAAllMA0I0tALZQAgAAozD9JwoFADAstwQAAMB8CgC6sgVAC0oAACAq038iUQAAAABAAQoAwrEFAABABpfTf+hNAUB3l7cBAABARtb/6U0BQEi2AAAAGJnpPxEpAAjBFgAAAJmZ/hPBq94PAG45fXx9VgzAy/wKAjC605u3JqWkYvpPVDYACEPYBwAgI9N/olAAEJrvAgAAYCSm/0SmACAUWwAAAGRi+k8kCgDCuSwBbAEAADCCy+m/8E80CgAAAAAoQAFASLYAAAAYiek/I1AAAAAAQAEKAMKyBQAAwAhM/xnFq94PAJY4fXx9nv7zf/Z+GLs4//6dDwoAgMH42T9GogAgtqRh/5rTL94++/BQCgAAjMX0n8gUAIR0LQxX9PB3UAQAAMRj+s9oFACEIfTf9vhvowwAAIjJ9J/oFAB0J/gvYysAAKA/039G5FcA6Er4X8/fDgAgDtN/RmADgC6E1zZsAwAAHM/0n1HZAOBwwn97/qYAAP2Y/jMKBQCHElT3428LALC/y+m/8M9IFAAcRkDdn78xAMB+rP4zOgUAhxBMj+NvDQBwDNN/RqMAYHcC6fH8zQEA2jL9JwMFALsSRPvxtwcA2I/pPyNSALAbAbQ/zwEAwHam/2ShAGAXgmccngsAgLZM/xmVAoDmBM54PCcAAOv42T8yUQAAAABcYfWfbBQANGXSHJfnBgBgG9N/RqcAoBkBMz7PEQDAPKb/ZKQAAAAAeORa+Df9JwMFAE2YLI/DcwUAsIzwTxYKAAAAgO9Y/SczBQAAAMANpv9kogBgMyvl4/GcAQA8Z/pPdgoAAACgPF/8RwUKADYxSR6X5w4A4Dbhn4wUAAAAQGlW/6lCAQAAAJRl9Z9KFAAAAADfEf7JTAEAAACUZPWfahQArOZL5MbnOQQAqrL6T0UKAAAAoDzhnwoUAAAAQClW/6lKAQAAAJRh9Z/KFAAAAEBZwj+VKAAAAIASrP5TnQIAAABIz+o/KAAAAICChH8qUgAAAACpWf2HTxQAAABAWlb/4QcKAAAAoAzhn8oUAAAAQEpW/+EpBQAAAJCO1X94TgEAAACkIvzDdQoAAAAgNeEfPlEAAAAAabjvH25TAAAAAClY/Yf7FAAAAMDwhH94mQIAAABIR/iH5xQAAADA0Nz3D/MoAAAAgGFZ/Yf5FAAAAMCQhH9YRgEAAACkIPzDfQoAAABgOO77h+UUAAAAwFCs/sM6CgAAAGAYwj+spwAAAACGJfzDfAoAAABgCO77h20UAAAAQHhW/2E7BQAAABCa8A9tKAAAAICwhH9oRwEAAAAMQ/iH9RQAAABASL70D9pSAAAAAOFY/Yf2FAAAAEAowj/sQwEAAACEIfzDfhQAAABACMI/7EsBAAAAhCT8Q1sKAAAAoDvf+A/7UwAAAABdWf2HYygAAACAboR/OI4CAAAA6EL4h2MpAAAAgMMJ/3A8BQAAAHAo4R/6UACw2vn371ykB+c5BACOJvxDPwoAAAAAKEABAAAAHML0H/pSAAAAALsT/qE/BQAAALAr4R9iUACwiS+RAwDgHuEf4lAAQGGnX7x99oEMANCK8A+xKADYzBbA2JQAAMAehH+IRwEAKAEAgKaEf4hJAQBM0zR+CXB+X3MTpeq/G8il4rUs879Z+Ie4FAA04TYAAACEf4hNAQB8b/QtAACgH+Ef4lMA0IwtgByUAADAUsI/jEEBQFNKgBxGLQEy3095TbV/L5BbpWtatn+r8A/jUAAAV41aAgAAxxH+YSwKAJqzBZDHiCVAtqnKLVX+nUAtFa5tmf6N18I/EJsCgF0oAfIYsQQAAPZ1K/yb/kNsCgB2owTIY7QSINN05Zrs/z6gtszXuCz/NuEfxqUAYFdKAACAPIR/GJsCgN0pAXKwBRBD1n8XwGMZr3UZ/k3CP4xPAcAhlAA5KAH6yvbvAbgn0zUvw79F+IccFAAcRgmQgxKgjyz/DoAlMlz7MvwbhH/I43Q+D3WWJ4HRAiTXjVbonN6M+7rLcHgE2GLUa3iG6/e18C/4w7hsAHC40YIj141W5Ix6CBv1cQO0NOK1cMTHfEn4h3xsANDVaCGS50YrdEaaImU4PAK0NMo1PMP1W/iHnGwA0NVo4ZHnRitxRjmUjfI4AY40wrVxhMf4EuEf8rIBQBijBUl+MGqRE3GSlOHgCHCEaNfwLNdv4R9yUwAQkjJgPKOWANMU4xCZ5eAIcLTe1/BM12/hH/JTABCaImAsI5cA09TnEJnp4AjQ09HX8GzXb+EfalAAMJyspcBleB713zl6CfDYHofJbAdGgKhaX8MzX7+Ff6hDAQCBKQEAgL1cC/7TJPxDZn4FAAIbNUiPWlwAQBXCP9SkAAB2oQQAgJiEf6hLAQDBjboFME1KAACIRviH2hQAMICRSwAAIAbhH/AlgDCQUSfqCgwA6Ms3/QPTZAMAhjJqkB61uACADIR/4IECAAaTqQRQDADAfj7/+ouz8A88pgCAAWUoAR7+ZyUAALTnfn/gGt8BAAPLFJ5HLTUAIBrhH7jFBgAQQqYyAwB6Ef6Be2wAwOCyBWebAACwjvv9gZcoACABJQAA1GXqD8zlFgBIIFtgzlZoAMBehH9gCQUAJKEEAIBahH9gKQUAJKIEAIAahH9gDd8BAAllC87Zig0AWEvwB7awAQAJZQvM2QoNAFhD+Ae2UgAAQ1ACAFCZ8A+04BYASCxjaM623QAA99wK/tMk/APLKQAgOSUAAIzJ1B9ozS0AkFzGsJyx1ACAx4R/YA82AKCIjKE5Y7kBQG1W/oE9KQCgECUAAMRl6g/szS0AUEjGsJyx1ACgHuEfOIINACgoY2jOWG4AkJ+Vf+BINgCAFDKWGgDkdm/qL/wDe1AAQEFZp+VKAABGYeUf6MEtAFBY1sCcteAAYHxW/oGeFABQnBIAAI5h6g/0pgAAlAAAsCNTfyAK3wEApA3KWYsNAMYh/AOR2AAAvpc1MGctOACIS/AHIrIBAHwva1DOWmwAEJPwD0RlAwB4JmtgzlpwABCD4A9EZwMAKCNrsQFAf8I/MAIbAMBVmcOyTQAAWhH8gZHYAACuyhySM5cbABxH+AdGYwMAuCtzWM5ccgCwH8EfGJUNAOCuzCE5c7kBwD6Ef2BkNgCAWTKH5cwlBwBtCP5ABgoAYDYlAADV3Av+0yT8A2NRAACLKAEAqMLUH8jmVe8HABDFQ7mhCACozdQfyMoGALBY5i2AB0oAgJpM/YHMFADAKkoAADIR/IEKFADAakoAAEZn3R+oRAEAbKIEAGBEgj9QkQIA2EwJAMBIrPsDVSkAgCaUAABEZ+oPVKcAAJpRAgAQkeAP8Mmr3g8AYCSnX7w9KwEAxiD4AzxlAwBoqsIWwDTZBACITPAHuO6z3g8AyKVKMK5SdACMRvgHuM0GALCLKgG5SuEBEJ3gD/AyBQCwGyUAAHsT/AHmUwAAu1ICALAHwR9gOQUAsDslAACtCP4A6ykAgEMoAQDYQvAH2O5V7wcAkMnpF2/PSgCAdgR/gHZsAACHqbIFME02AQC2ein4T5PwD7CUAgA4lBIAgHsEf4D9KACAwykBALgk+APsTwEAdKEEAGBO6J8mwR+gFQUA0I0SAKAm036APhQAQFdKAIA6BH+AvhQAQHdKAIDcBH+AGD7r/QAA5soQniuVHUBtn3/9xfnh/937v/v2y29Owj/AMWwAACG8FIwfh/8MITpDmQFwjS/2A4hLAQCEcS3Y3wrKSgCAWAR/gPgUAEAoj4P9SwFZCQDQl9APMBYFABDO6Rdvz3ODsRIA4HiCP8CYFADA0DIUANOkBADimxv6p0nwB4hKAQAMTwkAsB/TfoA8FABACkoAgHZM+wFyUgAAaSgBANYT+gHyUwAAqSgBAJYR/AHqUAAA6SgBAO4T+gFqUgAAKSkBAJ5aEvqnSfAHyOhV7wcAsIfz79+dspQAAGsJ/QA8ZgMASC1DCWALAFhC6AfgFgUAkJ4SAMhO6AdgDgUAUIISAMhkaeCfJqEfAAUAUIgSABiZ0A/AVgoAoJQMJcA0KQKggjWBf5qEfgBuUwAA5SgBgKiEfgD2pAAASlICABGsDfzTJPQDsJwCAChLCQAcTeAHoCcFAFCaEgDY05bAP01CPwBtKQCA8pQAQCsCPwCRKQAAJiUAsNzWsD9NAj8Ax1IAAHxHCQDc0iLsPxD6AehFAQDwiBIAEPYByEoBAHBBCQB1tAz70yTwAxCbAgDgCiUA5NE65D8Q9gEYjQIA4AYlAIxjr5D/mMAPwOgUAAB3KAEghiMC/gNBH4CsFAAAL1ACwPGOCvzCPgCVKAAAZlACwLF8OR8AtKcAAJhJCQDHWVMACPkAcJ8CAGABJQAc57IEEPABYBsFAMBCSgAAAEb0We8HADCaLME5S5EBAMA8CgCAFZQAAACMRgEAsJISAACAkSgAADZQAgAAMAoFAMBGSgAAAEagAABoQAkAAEB0fgYQoLEMITpLoQEAwA9sAAA0liE8ZygxAAB4SgEAsAMlAAAA0SgAAHaiBAAAIBIFAMCOlAAAAEShAADYmRIAAIAIFAAAB1ACAADQmwIA4CBKAAAAelIAABxICQAAQC8KAICDKQEAAOhBAQDQgRIAAICjKQAAOlECAABwJAUAQEejlwCjP34AgEoUAACdjRqiR33cAABVKQAAAhgtTI/2eAEAUAAAhDFKqB7lcQIA8JQCACCQ6OE6+uMDAOA2BQBAMFFDdtTHBQDAPAoAgICihe1ojwcAgOUUAABBRQndUR4HAADbKAAAAusdvnv/9wMA0I4CACC4XiFc+AcAyEUBADCAo8O48A8AkI8CAGAQR4Vy4R8AICcFAMBA9g7nwj8AQF4KAIDB7BXShX8AgNwUAAADah3WhX8AgPwUAACDahXahX8AgBoUAAAD2xrehX8AgDoUAACDWxvihX8AgFoUAAAJLA3zwj8AQD0KAIAk5oZ64R8AoCYFAEAiL4V74R8AoC4FAEAyt0K+8A8AUJsCACChy7Av/AMAoAAASOoh9Av/AABM0zSdzudz78cAAAAA7MwGAAAAABSgAAAAAIACFAAAAABQgAIAAAAAClAAAAAAQAEKAAAAAChAAQAAAAAFKAAAAACgAAUAAAAAFKAAAAAAgAIUAAAAAFCAAgAAAAAKUAAAAABAAQoAAAAAKEABAAAAAAUoAAAAAKAABQAAAAAUoAAAAACAAhQAAAAAUIACAAAAAApQAAAAAEABCgAAAAAoQAEAAAAABSgAAAAAoAAFAAAAABSgAAAAAIACFAAAAABQgAIAAAAAClAAAAAAQAEKAAAAAChAAQAAAAAFKAAAAACgAAUAAAAAFKAAAAAAgAIUAAAAAFCAAgAAAAAKUAAAAABAAQoAAAAAKEABAAAAAAUoAAAAAKAABQAAAAAUoAAAAACAAhQAAAAAUIACAAAAAApQAAAAAEABCgAAAAAoQAEAAAAABSgAAAAAoAAFAAAAABSgAAAAAIACFAAAAABQgAIAAAAAClAAAAAAQAEKAAAAAChAAQAAAAAFKAAAAACgAAUAAAAAFKAAAAAAgAIUAAAAAFCAAgAAAAAKUAAAAABAAQoAAAAAKEABAAAAAAUoAAAAAKAABQAAAAAUoAAAAACAAhQAAAAAUIACAAAAAApQAAAAAEABCgAAAAAoQAEAAAAABSgAAAAAoAAFAAAAABSgAAAAAIACFAAAAABQgAIAAAAAClAAAAAAQAEKAAAAAChAAQAAAAAF/H8hvxaS20HkDgAAAABJRU5ErkJggg==" class="logo" alt="Logo voiture électrique">
+<div><h1>Suivi voiture électrique</h1><p class="sub">Recharge habituelle automatique, relevés, coûts, économies et statistiques.</p></div>
+</div></header>
+
+<nav class="tabs">
+<button class="tab active" data-tab="home">Accueil</button>
+<button class="tab" data-tab="matin">Matin</button>
+<button class="tab" data-tab="recharge">Mémo soir</button>
+<button class="tab" data-tab="stats">Stats</button>
+<button class="tab" data-tab="history">Historique</button>
+<button class="tab" data-tab="settings">Paramètres</button>
+</nav>
+
+<section id="home" class="page">
+<div id="homeStats" class="grid grid4"></div>
+<div class="card"><h2>Dernière recharge</h2><div id="lastCharge">Aucune recharge.</div></div>
+<div class="card"><h2>Dernier relevé</h2><div id="lastReading">Aucun relevé.</div></div>
+</section>
+
+<section id="matin" class="page hide">
+<div class="card">
+<h2>☀️ Relevé du matin + recharge</h2>
+<p class="muted">Sur cette page tu rentres tout en une fois : le pourcentage du soir à l'arrivée, le nouveau pourcentage du matin, l'autonomie, la température et le kilométrage. Par défaut, l'application utilise ta recharge habituelle 22h10 → 06h00 en heures creuses.</p>
+<div id="memoMorningCard" class="card" style="margin-top:0;background:#f0fdf4">
+<h3>📝 Pense-bête d'hier soir</h3>
+<div id="memoMorningContent">Aucun pense-bête enregistré.</div>
+</div>
+<div class="ok">Formule recharge : (% matin − % soir) × capacité batterie. Puis coût = kWh × tarif.</div>
+<div class="grid grid3">
+<div><label>Date</label><input id="m_date" type="date"></div>
+<div><label>Pourcentage du soir à l'arrivée (%)</label><input id="m_before" type="number" min="0" max="100" placeholder="43" oninput="previewMorning(false)"></div>
+<div><label>Nouveau pourcentage du matin (%)</label><input id="m_after" type="number" min="0" max="100" placeholder="80" oninput="previewMorning(false)"></div>
+<div><label>Autonomie affichée le matin (km)</label><input id="m_range" type="number" min="0" placeholder="350"></div>
+<div><label>Température (°C)</label><input id="m_temp" type="number" placeholder="12"></div>
+<div><label>Kilométrage total (km)</label><input id="m_odo" type="number" min="0" placeholder="24500"></div>
+<div><label>Moment</label><select id="m_moment"><option>Matin</option><option>Midi</option><option>Soir</option></select></div>
+<div><label>Type de recharge</label><select id="m_mode" onchange="toggleManualTimes(); previewMorning(false)">
+<option value="habitual">Recharge habituelle 22h10 → 06h00</option>
+<option value="auto">Recharge exceptionnelle : répartition automatique HP/HC</option>
+<option value="hc">Forcer heures creuses</option>
+<option value="hp">Forcer heures pleines</option>
+</select></div>
+<div id="manualStartBox" class="hide"><label>Heure début recharge</label><input id="m_start" type="time" value="22:10" onchange="previewMorning(false)"></div>
+<div id="manualEndBox" class="hide"><label>Heure fin recharge</label><input id="m_end" type="time" value="06:00" onchange="previewMorning(false)"></div>
+</div>
+<label>Note</label><input id="m_note" placeholder="Ex : chauffage, autoroute, pluie...">
+<div id="morningPreview" class="notice" style="margin-top:12px"></div>
+<div class="row" style="margin-top:14px">
+<button class="primary" onclick="saveMorning()">Enregistrer matin + recharge</button>
+<button class="secondary" onclick="previewMorning()">Calculer</button>
+<button class="secondary" onclick="prefillLast()">Reprendre dernier relevé</button>
+</div>
+</div>
+</section>
+
+<section id="recharge" class="page hide">
+<div class="card">
+<h2>🌙 Mémo soir optionnel</h2>
+<p class="muted">Optionnel : tu peux noter le pourcentage du soir ici. Il sera proposé dans la page Matin, mais tu peux aussi le rentrer directement le matin.</p>
+<div class="grid grid2">
+<div><label>Date</label><input id="s_date" type="date"></div>
+<div><label>% batterie à l'arrivée maison</label><input id="s_percent" type="number" min="0" max="100" placeholder="43"></div>
+</div>
+<div class="row" style="margin-top:14px">
+<button class="primary" onclick="saveMemo()">Enregistrer pour demain matin</button>
+<button class="danger" onclick="clearMemo()">Effacer</button>
+</div>
+<div id="memoBox" style="margin-top:12px"></div>
+</div>
+</section>
+
+<section id="stats" class="page hide">
+<div id="statsCards" class="grid grid4"></div>
+<div class="card"><h2>💶 Coût par mois</h2><div class="scroll"><table id="monthTable"></table></div></div>
+<div class="card"><h2>⛽ Comparatif essence</h2><div id="fuelBox"></div></div>
+<div class="card"><h2>🛣️ Kilomètres par relevé</h2><p class="muted">Même si tu oublies un jour, l'application calcule la distance depuis le dernier kilométrage connu.</p><div class="scroll"><table id="distanceTable"></table></div></div>
+<div class="card"><h2>🔋 Électricité estimée si recharge oubliée</h2><div id="missingElectricBox"></div><div class="scroll"><table id="missingElectricTable"></table></div></div>
+<div class="card"><h2>🌡️ Autonomie par température</h2><div class="row"><span class="pill">Tranches de 5°C</span><select id="tempFilter" onchange="render()"><option value="all">Toutes</option></select></div><div class="scroll"><table id="tempTable"></table></div></div>
+</section>
+
+<section id="history" class="page hide">
+<div class="card"><div class="row" style="justify-content:space-between"><h2>Relevés</h2><button class="secondary" onclick="exportCSV()">Exporter CSV</button></div><div class="scroll"><table id="readingsTable"></table></div></div>
+<div class="card"><h2>Recharges</h2><div class="scroll"><table id="chargesTable"></table></div></div>
+</section>
+
+<section id="settings" class="page hide">
+<div class="card">
+<h2>⚙️ Paramètres recharge et carburant</h2>
+<div class="grid grid3">
+<div><label>Capacité batterie utile (kWh)</label><input id="p_bat" type="number" step="0.1"></div>
+<div><label>Prix heures creuses €/kWh</label><input id="p_hc" type="number" step="0.001"></div>
+<div><label>Prix heures pleines €/kWh</label><input id="p_hp" type="number" step="0.001"></div>
+<div><label>Début heures creuses</label><input id="p_hcStart" type="time"></div>
+<div><label>Fin heures creuses</label><input id="p_hcEnd" type="time"></div>
+<div><label>Puissance charge estimée (kW)</label><input id="p_power" type="number" step="0.1"></div>
+<div><label>Début recharge habituelle</label><input id="p_habitStart" type="time"></div>
+<div><label>Fin recharge habituelle</label><input id="p_habitEnd" type="time"></div>
+<div><label>Prix du litre essence/diesel (€)</label><input id="p_fuelPrice" type="number" step="0.01"></div>
+<div><label>Consommation thermique (L/100 km)</label><input id="p_fuelCons" type="number" step="0.1"></div>
+<div><label>Conso électrique estimée (% / 100 km)</label><input id="p_evPct100" type="number" step="0.1"></div>
+</div>
+<label><input id="p_sched" type="checkbox" style="width:auto"> Utiliser la recharge habituelle comme 100 % heures creuses</label>
+<div class="row" style="margin-top:14px">
+<button class="primary" onclick="saveSettings()">Sauvegarder les paramètres</button>
+<button class="secondary" onclick="resetSettings()">Réglages par défaut</button>
+</div>
+</div>
+<div class="card">
+<h2>💾 Sauvegarde</h2>
+<div class="row">
+<button class="success" onclick="exportJSON()">Exporter JSON</button>
+<label class="blue" style="border-radius:16px;padding:12px 14px;font-weight:900;cursor:pointer">Importer JSON<input type="file" accept="application/json" onchange="importJSON(event)" class="hide"></label>
+</div>
+</div>
+</section>
+</div>
+
+<script>
+const KEY="suivi-ve-v8";
+const DEF={batteryKwh:64,hcPrice:.16,hpPrice:.21,hcStart:"22:06",hcEnd:"06:06",chargePowerKw:7.4,fuelPrice:1.80,fuelCons:6,habitualStart:"22:10",habitualEnd:"06:00",evPctPer100km:20,scheduledAllHC:true};
+let state=load();
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{settings:{...DEF},readings:[],charges:[],memo:null}}catch{return {settings:{...DEF},readings:[],charges:[],memo:null}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
+function today(){return new Date().toISOString().slice(0,10)}
+function n(v){return Number(v)||0} function pct(v){return Math.round(n(v)*10)/10}
+function euro(v){return n(v).toLocaleString("fr-FR",{style:"currency",currency:"EUR"})}
+function fr(d){return d?new Date(d+"T12:00:00").toLocaleDateString("fr-FR"):"—"}
+function uuid(){return crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random())}
+function month(d){return d?d.slice(0,7):""}
+function monthFR(k){let [y,m]=k.split("-");return new Date(+y,+m-1,1).toLocaleDateString("fr-FR",{month:"long",year:"numeric"})}
+function tmin(t){let [h,m]=t.split(":").map(Number);return h*60+m}
+function isHC(min){let s=tmin(state.settings.hcStart),e=tmin(state.settings.hcEnd);return s>e?(min>=s||min<e):(min>=s&&min<e)}
+function split(start,end,kwh){let s=tmin(start),e=tmin(end);if(e<=s)e+=1440;let hc=0;for(let i=s;i<e;i++)if(isHC(i%1440))hc++;let hcKwh=kwh*(hc/Math.max(e-s,1));return{hcKwh,hpKwh:kwh-hcKwh}}
+function calc(before,after,mode,start,end){let added=Math.max(0,n(after)-n(before)),kwh=state.settings.batteryKwh*added/100,hc=0,hp=0,label="";
+ if(mode==="habitual"&&state.settings.scheduledAllHC){hc=kwh;label="Recharge habituelle "+state.settings.habitualStart+" → "+state.settings.habitualEnd+" comptée 100 % heures creuses"}
+ else if(mode==="habitual"){let r=split(state.settings.habitualStart,state.settings.habitualEnd,kwh);hc=r.hcKwh;hp=r.hpKwh;label="Recharge habituelle répartie selon les heures HP/HC"}
+ else if(mode==="hc"){hc=kwh;label="Forcé heures creuses"} else if(mode==="hp"){hp=kwh;label="Forcé heures pleines"}
+ else {let r=split(start,end,kwh);hc=r.hcKwh;hp=r.hpKwh;label="Recharge exceptionnelle répartie automatiquement entre HP et HC"}
+ return{addedPct:added,kwh,hcKwh:hc,hpKwh:hp,cost:hc*state.settings.hcPrice+hp*state.settings.hpPrice,label}}
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".page").forEach(p=>p.classList.add("hide"));document.getElementById(b.dataset.tab).classList.remove("hide");render()});
+function stat(k,v){return`<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`}
+function render(){renderHome();renderMorning();renderMemo();renderStats();renderHistory();renderSettings()}
+function renderHome(){let mk=month(today()),mc=state.charges.filter(c=>month(c.date)===mk),cost=mc.reduce((s,c)=>s+n(c.cost),0),total=state.charges.reduce((s,c)=>s+n(c.cost),0);homeStats.innerHTML=[stat("Coût ce mois-ci",euro(cost)),stat("Recharges ce mois-ci",mc.length),stat("Coût total",euro(total)),stat("Relevés",state.readings.length)].join("");
+ let c=[...state.charges].sort((a,b)=>b.date.localeCompare(a.date))[0];lastCharge.innerHTML=c?`<div class="grid grid4">${stat("Arrivée",c.before+"%")}${stat("Matin",c.after+"%")}${stat("Ajouté","+"+pct(c.addedPct)+"%")}${stat("Coût",euro(c.cost))}</div><p class="muted">${fr(c.date)} — ${pct(c.kwh)} kWh, HC ${pct(c.hcKwh)} kWh, HP ${pct(c.hpKwh)} kWh.</p>`:"Aucune recharge.";
+ let r=[...state.readings].sort((a,b)=>b.date.localeCompare(a.date))[0];lastReading.innerHTML=r?`<div class="grid grid4">${stat("Batterie",r.charge+"%")}${stat("Autonomie",r.range+" km")}${stat("Temp.",r.temp+"°C")}${stat("Km total",r.odo+" km")}</div><p class="muted">${fr(r.date)} — ${r.moment}</p>`:"Aucun relevé."}
+function renderMorning(){
+ if(state.memo){
+   memoMorningContent.innerHTML = `<b>${state.memo.percent}%</b> enregistrés le ${fr(state.memo.date)}`;
+   if(!m_before.value) m_before.value=state.memo.percent;
+ } else {
+   memoMorningContent.innerHTML = "🔴 Aucun pense-bête enregistré.";
+ }
+ previewMorning(false)
+}
+function previewMorning(show=true){
+ if(!m_before.value || !m_after.value){morningPreview.innerHTML="Entre le % du soir et le % du matin pour calculer la recharge.";return null}
+ let before=n(m_before.value), after=n(m_after.value);
+ if(after<before){morningPreview.innerHTML="Le % du matin est inférieur au % du soir : aucune recharge positive à calculer.";return null}
+ let r=calc(before,after,m_mode.value,m_start.value||"22:10",m_end.value||"06:00");
+ morningPreview.innerHTML=`<b>Recharge :</b> ${before}% → ${after}% = +${pct(r.addedPct)}% — ${pct(r.kwh)} kWh — <b>${euro(r.cost)}</b><br>HC : ${pct(r.hcKwh)} kWh × ${state.settings.hcPrice} € | HP : ${pct(r.hpKwh)} kWh × ${state.settings.hpPrice} €<br><span class="muted">${r.label}</span>`;
+ return r
+}
+function saveMorning(){if(!m_before.value||!m_after.value||!m_range.value||!m_temp.value||!m_odo.value){alert("Remplis le % du soir, le % du matin, l'autonomie, la température et le kilométrage.");return}
+ let d=m_date.value||today();
+ state.readings.push({id:uuid(),date:d,moment:m_moment.value,charge:n(m_after.value),range:n(m_range.value),temp:n(m_temp.value),odo:n(m_odo.value),note:m_note.value.trim()});
+ let r=previewMorning(false);
+ if(r&&r.addedPct>0){
+   let startUsed=m_mode.value==="habitual"?state.settings.habitualStart:(m_start.value||"22:10");
+   let endUsed=m_mode.value==="habitual"?state.settings.habitualEnd:(m_end.value||"06:00");
+   state.charges.push({id:uuid(),date:d,before:n(m_before.value),after:n(m_after.value),start:startUsed,end:endUsed,mode:m_mode.value,addedPct:r.addedPct,kwh:r.kwh,hcKwh:r.hcKwh,hpKwh:r.hpKwh,cost:r.cost});
+ }
+ state.memo=null;
+ m_before.value=m_after.value=m_range.value=m_temp.value=m_odo.value=m_note.value="";
+ save();alert("Relevé du matin et recharge enregistrés.")}
+function saveMemo(){if(s_percent.value===""||n(s_percent.value)<0||n(s_percent.value)>100){alert("Entre un pourcentage valide.");return}state.memo={date:s_date.value||today(),percent:n(s_percent.value)};save()}
+function clearMemo(){state.memo=null;save()} function renderMemo(){memoBox.innerHTML=state.memo?`<div class="ok">Arrivée enregistrée : ${state.memo.percent}% le ${fr(state.memo.date)}.</div>`:`<div class="notice">Aucun pense-bête actif.</div>`}
+function prefillLast(){let r=[...state.readings].sort((a,b)=>b.date.localeCompare(a.date))[0];if(!r){alert("Aucun relevé précédent.");return}m_range.value=r.range;m_temp.value=r.temp;m_odo.value=r.odo}
+
+function buildDistanceIntervals(){
+  let rows=[...state.readings].filter(r=>r.odo!=="" && r.odo!==undefined && !Number.isNaN(n(r.odo))).sort((a,b)=>{
+    if(a.date!==b.date) return a.date.localeCompare(b.date);
+    return String(a.id).localeCompare(String(b.id));
+  });
+  let intervals=[];
+  for(let i=1;i<rows.length;i++){
+    let prev=n(rows[i-1].odo), cur=n(rows[i].odo);
+    let km=cur-prev;
+    if(km>0){
+      intervals.push({
+        date:rows[i].date,
+        prevOdo:prev,
+        odo:cur,
+        km:km,
+        fuelCost: km * state.settings.fuelCons / 100 * state.settings.fuelPrice
+      });
+    }
+  }
+  return intervals;
+}
+
+
+function buildEstimatedElectricFromKm(){
+  let intervals=buildDistanceIntervals();
+  let estimated=[];
+  const pct100 = state.settings.evPctPer100km || 20;
+  const kwhPer100 = state.settings.batteryKwh * pct100 / 100;
+  const price = state.settings.hcPrice; // estimation prudente : recharge habituelle en heures creuses
+  intervals.forEach(x=>{
+    const pctUsed = x.km * pct100 / 100;
+    const kwh = x.km * kwhPer100 / 100;
+    const cost = kwh * price;
+    estimated.push({
+      date:x.date,
+      km:x.km,
+      pctUsed,
+      kwh,
+      cost
+    });
+  });
+  return estimated;
+}
+
+function renderStats(){let total=state.charges.reduce((s,c)=>s+n(c.cost),0),kwh=state.charges.reduce((s,c)=>s+n(c.kwh),0),year=String(new Date().getFullYear()),yc=state.charges.filter(c=>c.date.startsWith(year)).reduce((s,c)=>s+n(c.cost),0);let odo=[...state.readings].filter(r=>r.odo).sort((a,b)=>n(a.odo)-n(b.odo)),km=odo.length>1?n(odo.at(-1).odo)-n(odo[0].odo):0;let intervalsForCards=buildDistanceIntervals();let kmForCards=intervalsForCards.reduce((s,x)=>s+x.km,0);
+statsCards.innerHTML=[stat("Coût total",euro(total)),stat("Coût année",euro(yc)),stat("kWh rechargés",pct(kwh)+" kWh"),stat("Coût / 100 km",kmForCards?euro(total/kmForCards*100):"—")].join("");
+ let bm={};state.charges.forEach(c=>{let k=month(c.date);bm[k]??={count:0,kwh:0,cost:0,hc:0,hp:0};bm[k].count++;bm[k].kwh+=n(c.kwh);bm[k].cost+=n(c.cost);bm[k].hc+=n(c.hcKwh);bm[k].hp+=n(c.hpKwh)});monthTable.innerHTML="<tr><th>Mois</th><th>Recharges</th><th>kWh</th><th>HC</th><th>HP</th><th>Coût</th></tr>"+Object.keys(bm).sort().reverse().map(k=>`<tr><td>${monthFR(k)}</td><td>${bm[k].count}</td><td>${pct(bm[k].kwh)}</td><td>${pct(bm[k].hc)}</td><td>${pct(bm[k].hp)}</td><td><b>${euro(bm[k].cost)}</b></td></tr>`).join("");
+ let intervals=buildDistanceIntervals();
+let kmIntervals=intervals.reduce((s,x)=>s+x.km,0);
+let therm=intervals.reduce((s,x)=>s+x.fuelCost,0);
+let elecForCompare=total;
+fuelBox.innerHTML=kmIntervals?`<div class="grid grid4">${stat("Km calculés",kmIntervals+" km")}${stat("Coût électrique",euro(elecForCompare))}${stat("Essence estimée",euro(therm))}${stat("Économie estimée",euro(therm-elecForCompare))}</div><p class="muted">Calcul essence par intervalle : à chaque relevé, distance = kilométrage actuel − kilométrage précédent. Puis distance × ${state.settings.fuelCons} L/100 km ÷ 100 × ${state.settings.fuelPrice} €/L. Si tu oublies un jour, les kilomètres sont simplement regroupés au relevé suivant.</p>`:`<div class="notice">Ajoute au moins deux relevés avec kilométrage pour estimer le coût essence.</div>`;
+distanceTable.innerHTML="<tr><th>Date</th><th>Km précédent</th><th>Km actuel</th><th>Distance</th><th>Essence estimée</th></tr>"+intervals.slice().reverse().map(x=>`<tr><td>${fr(x.date)}</td><td>${x.prevOdo} km</td><td>${x.odo} km</td><td><b>${x.km} km</b></td><td>${euro(x.fuelCost)}</td></tr>`).join("");
+let estElec=buildEstimatedElectricFromKm();
+let estElecTotal=estElec.reduce((s,x)=>s+x.cost,0);
+let estKwhTotal=estElec.reduce((s,x)=>s+x.kwh,0);
+missingElectricBox.innerHTML=estElec.length?`<div class="grid grid3">${stat("Élec estimée km",euro(estElecTotal))}${stat("kWh estimés",pct(estKwhTotal)+" kWh")}${stat("Base calcul", (state.settings.evPctPer100km||20)+"% / 100 km")}</div><p class="muted">Cette estimation sert si tu oublies d'enregistrer une recharge. Formule : km × ${state.settings.evPctPer100km||20}% / 100 × ${state.settings.batteryKwh} kWh × ${state.settings.hcPrice} €/kWh. Le tarif utilisé est l'heure creuse par défaut.</p>`:`<div class="notice">Ajoute au moins deux relevés avec kilométrage pour estimer l'électricité.</div>`;
+missingElectricTable.innerHTML="<tr><th>Date</th><th>Distance</th><th>% estimé</th><th>kWh estimés</th><th>Coût estimé HC</th></tr>"+estElec.slice().reverse().map(x=>`<tr><td>${fr(x.date)}</td><td>${x.km} km</td><td>${pct(x.pctUsed)}%</td><td>${pct(x.kwh)} kWh</td><td><b>${euro(x.cost)}</b></td></tr>`).join("");
+ renderTempOptions();let f=tempFilter.value||"all",rows=[...state.readings];if(f!="all"){let[a,b]=f.split(":").map(Number);rows=rows.filter(r=>n(r.temp)>=a&&n(r.temp)<b)}rows.sort((a,b)=>n(b.range)-n(a.range));tempTable.innerHTML="<tr><th>Date</th><th>Autonomie</th><th>Température</th><th>Batterie</th><th>Km</th></tr>"+rows.map(r=>`<tr><td>${fr(r.date)}</td><td><b>${r.range} km</b></td><td>${r.temp}°C</td><td>${r.charge}%</td><td>${r.odo}</td></tr>`).join("")}
+function renderTempOptions(){let cur=tempFilter.value||"all",temps=state.readings.map(r=>n(r.temp));let opts='<option value="all">Toutes</option>';if(temps.length){let mi=Math.floor(Math.min(...temps)/5)*5,ma=Math.ceil((Math.max(...temps)+1)/5)*5;for(let a=mi;a<ma;a+=5)opts+=`<option value="${a}:${a+5}">${a}°C à ${a+5}°C</option>`}tempFilter.innerHTML=opts;tempFilter.value=[...tempFilter.options].some(o=>o.value==cur)?cur:"all"}
+function renderHistory(){readingsTable.innerHTML="<tr><th>Date</th><th>Moment</th><th>%</th><th>Autonomie</th><th>Temp.</th><th>Km</th><th>Note</th><th></th></tr>"+[...state.readings].sort((a,b)=>b.date.localeCompare(a.date)).map(r=>`<tr><td>${fr(r.date)}</td><td>${r.moment}</td><td>${r.charge}%</td><td>${r.range} km</td><td>${r.temp}°C</td><td>${r.odo}</td><td>${r.note||"—"}</td><td><button class="danger" onclick="delR('${r.id}')">Suppr.</button></td></tr>`).join("");
+chargesTable.innerHTML="<tr><th>Date</th><th>Avant</th><th>Après</th><th>+%</th><th>kWh</th><th>HC</th><th>HP</th><th>Coût</th><th></th></tr>"+[...state.charges].sort((a,b)=>b.date.localeCompare(a.date)).map(c=>`<tr><td>${fr(c.date)}</td><td>${c.before}%</td><td>${c.after}%</td><td>+${pct(c.addedPct)}%</td><td>${pct(c.kwh)}</td><td>${pct(c.hcKwh)}</td><td>${pct(c.hpKwh)}</td><td><b>${euro(c.cost)}</b></td><td><button class="danger" onclick="delC('${c.id}')">Suppr.</button></td></tr>`).join("")}
+function delR(id){if(confirm("Supprimer ?")){state.readings=state.readings.filter(x=>x.id!==id);save()}}function delC(id){if(confirm("Supprimer ?")){state.charges=state.charges.filter(x=>x.id!==id);save()}}
+function renderSettings(){p_bat.value=state.settings.batteryKwh;p_hc.value=state.settings.hcPrice;p_hp.value=state.settings.hpPrice;p_hcStart.value=state.settings.hcStart;p_hcEnd.value=state.settings.hcEnd;p_power.value=state.settings.chargePowerKw;p_habitStart.value=state.settings.habitualStart||"22:10";p_habitEnd.value=state.settings.habitualEnd||"06:00";p_fuelPrice.value=state.settings.fuelPrice;p_fuelCons.value=state.settings.fuelCons;p_evPct100.value=state.settings.evPctPer100km||20;p_sched.checked=!!state.settings.scheduledAllHC}
+function saveSettings(){state.settings={batteryKwh:n(p_bat.value),hcPrice:n(p_hc.value),hpPrice:n(p_hp.value),hcStart:p_hcStart.value,hcEnd:p_hcEnd.value,chargePowerKw:n(p_power.value),fuelPrice:n(p_fuelPrice.value),fuelCons:n(p_fuelCons.value),habitualStart:p_habitStart.value,habitualEnd:p_habitEnd.value,evPctPer100km:n(p_evPct100.value)||20,scheduledAllHC:p_sched.checked};save();alert("Paramètres sauvegardés.")}
+function resetSettings(){state.settings={...DEF};save()}
+function exportJSON(){download(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),"sauvegarde-suivi-ve.json")}
+function importJSON(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let o=JSON.parse(r.result);if(!o.settings||!o.readings||!o.charges)throw Error();state=o;save();alert("Import réussi.")}catch{alert("Fichier invalide.")}};r.readAsText(f)}
+function exportCSV(){let rows=[["Type","Date","Moment","Avant","Après","Batterie","Autonomie","Temp","Km","kWh","Coût","Note"]];state.readings.forEach(r=>rows.push(["Relevé",r.date,r.moment,"","",r.charge,r.range,r.temp,r.odo,"","",r.note||""]));state.charges.forEach(c=>rows.push(["Recharge",c.date,c.mode,c.before,c.after,"","","","",pct(c.kwh),euro(c.cost),""]));download(new Blob([rows.map(row=>row.map(x=>`"${String(x).replaceAll('"','""')}"`).join(";")).join("\n")],{type:"text/csv;charset=utf-8"}),"suivi-ve.csv")}
+function download(blob,name){let u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
+function toggleManualTimes(){
+ const manual=m_mode.value==="auto";
+ manualStartBox.classList.toggle("hide",!manual);
+ manualEndBox.classList.toggle("hide",!manual);
+}
+m_date.value=s_date.value=today();toggleManualTimes();render();if("serviceWorker"in navigator)navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
+</script>
+</body></html>
