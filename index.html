@@ -28,6 +28,8 @@ button{border:0;border-radius:16px;padding:12px 14px;font-weight:900;font-size:1
 table{border-collapse:collapse;width:100%;font-size:14px;min-width:800px}th,td{border-bottom:1px solid var(--line);padding:10px;text-align:left}th{font-size:12px;color:var(--muted);text-transform:uppercase}.scroll{overflow:auto}
 .pill{display:inline-block;background:#f1f5f9;border-radius:999px;padding:7px 10px;font-size:13px;font-weight:800}
 </style>
+<link rel="apple-touch-icon" href="icon-512.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 </head>
 <body>
 <div class="wrap">
@@ -142,7 +144,7 @@ table{border-collapse:collapse;width:100%;font-size:14px;min-width:800px}th,td{b
 <div class="card">
 <h2>💾 Sauvegarde</h2>
 <div class="row">
-<button class="success" onclick="exportJSON()">Exporter JSON</button>
+<button class="success" onclick="exportJSON()">Exporter JSON</button><button class="success" onclick="exportDatedBackup()">Créer une sauvegarde datée</button>
 <label class="blue" style="border-radius:16px;padding:12px 14px;font-weight:900;cursor:pointer">Importer JSON<input type="file" accept="application/json" onchange="importJSON(event)" class="hide"></label>
 </div>
 </div>
@@ -276,7 +278,7 @@ function delR(id){if(confirm("Supprimer ?")){state.readings=state.readings.filte
 function renderSettings(){p_bat.value=state.settings.batteryKwh;p_hc.value=state.settings.hcPrice;p_hp.value=state.settings.hpPrice;p_hcStart.value=state.settings.hcStart;p_hcEnd.value=state.settings.hcEnd;p_power.value=state.settings.chargePowerKw;p_habitStart.value=state.settings.habitualStart||"22:10";p_habitEnd.value=state.settings.habitualEnd||"06:00";p_fuelPrice.value=state.settings.fuelPrice;p_fuelCons.value=state.settings.fuelCons;p_evPct100.value=state.settings.evPctPer100km||20;p_sched.checked=!!state.settings.scheduledAllHC}
 function saveSettings(){state.settings={batteryKwh:n(p_bat.value),hcPrice:n(p_hc.value),hpPrice:n(p_hp.value),hcStart:p_hcStart.value,hcEnd:p_hcEnd.value,chargePowerKw:n(p_power.value),fuelPrice:n(p_fuelPrice.value),fuelCons:n(p_fuelCons.value),habitualStart:p_habitStart.value,habitualEnd:p_habitEnd.value,evPctPer100km:n(p_evPct100.value)||20,scheduledAllHC:p_sched.checked};save();alert("Paramètres sauvegardés.")}
 function resetSettings(){state.settings={...DEF};save()}
-function exportJSON(){download(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),"sauvegarde-suivi-ve.json")}
+function exportJSON(){download(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),"suivi-ve-" + new Date().toISOString().slice(0,10) + ".json")}
 function importJSON(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let o=JSON.parse(r.result);if(!o.settings||!o.readings||!o.charges)throw Error();state=o;save();alert("Import réussi.")}catch{alert("Fichier invalide.")}};r.readAsText(f)}
 function exportCSV(){let rows=[["Type","Date","Moment","Avant","Après","Batterie","Autonomie","Temp","Km","kWh","Coût","Note"]];state.readings.forEach(r=>rows.push(["Relevé",r.date,r.moment,"","",r.charge,r.range,r.temp,r.odo,"","",r.note||""]));state.charges.forEach(c=>rows.push(["Recharge",c.date,c.mode,c.before,c.after,"","","","",pct(c.kwh),euro(c.cost),""]));download(new Blob([rows.map(row=>row.map(x=>`"${String(x).replaceAll('"','""')}"`).join(";")).join("\n")],{type:"text/csv;charset=utf-8"}),"suivi-ve.csv")}
 function download(blob,name){let u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
@@ -287,4 +289,36 @@ function toggleManualTimes(){
 }
 m_date.value=s_date.value=today();toggleManualTimes();render();if("serviceWorker"in navigator)navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
 </script>
+
+<script>
+/* Renfort sauvegarde datée */
+(function(){
+  function getAppState(){
+    const keys = Object.keys(localStorage).filter(k => k.toLowerCase().includes("suivi"));
+    const data = {};
+    keys.forEach(k => {
+      try { data[k] = JSON.parse(localStorage.getItem(k)); }
+      catch { data[k] = localStorage.getItem(k); }
+    });
+    return {
+      exportedAt: new Date().toISOString(),
+      app: "Suivi VE",
+      version: "sauvegarde-datee",
+      localStorage: data
+    };
+  }
+  window.exportDatedBackup = function(){
+    const backup = getAppState();
+    const date = new Date().toISOString().slice(0,10);
+    const blob = new Blob([JSON.stringify(backup, null, 2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `suivi-ve-${date}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+})();
+</script>
+
 </body></html>

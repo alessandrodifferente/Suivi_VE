@@ -1,2 +1,1 @@
-Suivi VE Cloud V14 - Firebase.
-Collez firestore.rules dans Firestore > Règles.
+Suivi VE V13.2 - logo Kia e-Niro rouge intégré + sauvegarde datée.
