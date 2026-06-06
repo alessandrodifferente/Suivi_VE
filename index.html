@@ -109,7 +109,7 @@ table{border-collapse:collapse;width:100%;font-size:14px;min-width:800px}th,td{b
 <section id="stats" class="page hide">
 <div id="statsCards" class="grid grid4"></div>
 <div class="card"><h2>💶 Coût par mois</h2><div class="scroll"><table id="monthTable"></table></div></div>
-<div class="card"><h2>⛽ Comparatif essence</h2><div id="fuelBox"></div></div>
+<div class="card"><h2>⛽ Comparatif essence</h2><div id="fuelBox"></div><div class="scroll"><table id="fuelHistoryTable"></table></div></div>
 <div class="card"><h2>🛣️ Kilomètres par relevé</h2><p class="muted">Même si tu oublies un jour, l'application calcule la distance depuis le dernier kilométrage connu.</p><div class="scroll"><table id="distanceTable"></table></div></div>
 <div class="card"><h2>🔋 Électricité estimée si recharge oubliée</h2><div id="missingElectricBox"></div><div class="scroll"><table id="missingElectricTable"></table></div></div>
 <div class="card"><h2>🌡️ Autonomie par température</h2><div class="row"><span class="pill">Tranches de 5°C</span><select id="tempFilter" onchange="render()"><option value="all">Toutes</option></select></div><div class="scroll"><table id="tempTable"></table></div></div>
@@ -123,7 +123,7 @@ table{border-collapse:collapse;width:100%;font-size:14px;min-width:800px}th,td{b
 <div class="grid grid3">
 <div><label>Date</label><input id="e_date" type="date"></div>
 <div><label>Poste de dépense</label><select id="e_type" onchange="toggleManualExpense()">
-<option>Pneus</option><option>Permutation pneus</option><option>Freins</option><option>Liquide de frein</option><option>Balais d'essuie-glace</option><option>Lave-glace</option><option>Contrôle technique</option><option>Assurance</option><option>Carte grise / administratif</option><option>Réparation</option><option>Diagnostic</option><option>Batterie 12V</option><option>Recharge publique</option><option>Accessoire voiture</option><option>Lavage / nettoyage</option><option>Stationnement</option><option>Péage</option><option>Saisie manuelle</option>
+<option>Entretien de la voiture</option><option>Pneus</option><option>Permutation pneus</option><option>Freins</option><option>Liquide de frein</option><option>Balais d'essuie-glace</option><option>Lave-glace</option><option>Contrôle technique</option><option>Assurance</option><option>Carte grise / administratif</option><option>Réparation</option><option>Diagnostic</option><option>Batterie 12V</option><option>Recharge publique</option><option>Accessoire voiture</option><option>Lavage / nettoyage</option><option>Stationnement</option><option>Péage</option><option>Saisie manuelle</option>
 </select></div>
 <div><label>Coût (€)</label><input id="e_cost" type="number" step="0.01" min="0" placeholder="89.90"></div>
 </div>
@@ -152,7 +152,7 @@ table{border-collapse:collapse;width:100%;font-size:14px;min-width:800px}th,td{b
 <div><label>Puissance charge estimée (kW)</label><input id="p_power" type="number" step="0.1"></div>
 <div><label>Début recharge habituelle</label><input id="p_habitStart" type="time"></div>
 <div><label>Fin recharge habituelle</label><input id="p_habitEnd" type="time"></div>
-<div><label>Prix du litre essence/diesel (€)</label><input id="p_fuelPrice" type="number" step="0.01"></div>
+<div><label>Prix du litre essence/diesel (€)</label><input id="p_fuelPrice" type="number" step="0.01"><small class="muted">Si tu changes ce prix, il s’applique aux relevés futurs grâce à l’historique des prix carburant.</small></div>
 <div><label>Consommation thermique (L/100 km)</label><input id="p_fuelCons" type="number" step="0.1"></div>
 <div><label>Conso électrique estimée (% / 100 km)</label><input id="p_evPct100" type="number" step="0.1"></div>
 </div>
@@ -174,7 +174,7 @@ table{border-collapse:collapse;width:100%;font-size:14px;min-width:800px}th,td{b
 
 <script>
 const KEY="suivi-ve-v8";
-const DEF={batteryKwh:64,hcPrice:.16,hpPrice:.21,hcStart:"22:06",hcEnd:"06:06",chargePowerKw:7.4,fuelPrice:1.80,fuelCons:6,habitualStart:"22:10",habitualEnd:"06:00",evPctPer100km:20,scheduledAllHC:true};
+const DEF={batteryKwh:64,hcPrice:.16,hpPrice:.21,hcStart:"22:06",hcEnd:"06:06",chargePowerKw:7.4,fuelPrice:1.80,fuelCons:6,fuelHistory:[],habitualStart:"22:10",habitualEnd:"06:00",evPctPer100km:20,scheduledAllHC:true};
 let state=load();
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||{settings:{...DEF},readings:[],charges:[],expenses:[],memo:null}}catch{return {settings:{...DEF},readings:[],charges:[],expenses:[],memo:null}}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
@@ -271,6 +271,38 @@ function renderMaintenance(){
     [...expenses].sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(x=>`<tr><td>${fr(x.date)}</td><td><b>${x.type}</b></td><td>${euro(x.cost)}</td><td>${x.reason||"—"}</td><td><button class="danger" onclick="delExpense('${x.id}')">Suppr.</button></td></tr>`).join("");
 }
 
+
+function getFuelSettingsForDate(date){
+  const history = (state.settings.fuelHistory || []).slice().sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+  let active = null;
+  for(const h of history){
+    if((h.date || "") <= (date || "")) active = h;
+  }
+  if(active) return {fuelPrice:n(active.fuelPrice), fuelCons:n(active.fuelCons)};
+  return {fuelPrice:n(state.settings.fuelPrice), fuelCons:n(state.settings.fuelCons)};
+}
+function updateFuelHistoryIfNeeded(newFuelPrice, newFuelCons){
+  if(!state.settings.fuelHistory) state.settings.fuelHistory = [];
+  const oldPrice = n(state.settings.fuelPrice);
+  const oldCons = n(state.settings.fuelCons);
+  const priceChanged = oldPrice !== n(newFuelPrice);
+  const consChanged = oldCons !== n(newFuelCons);
+  if(priceChanged || consChanged){
+    if(state.settings.fuelHistory.length === 0){
+      state.settings.fuelHistory.push({
+        date: "0000-01-01",
+        fuelPrice: oldPrice,
+        fuelCons: oldCons
+      });
+    }
+    state.settings.fuelHistory.push({
+      date: today(),
+      fuelPrice: n(newFuelPrice),
+      fuelCons: n(newFuelCons)
+    });
+  }
+}
+
 function buildDistanceIntervals(){
   let rows=[...state.readings].filter(r=>r.odo!=="" && r.odo!==undefined && !Number.isNaN(n(r.odo))).sort((a,b)=>{
     if(a.date!==b.date) return a.date.localeCompare(b.date);
@@ -286,7 +318,7 @@ function buildDistanceIntervals(){
         prevOdo:prev,
         odo:cur,
         km:km,
-        fuelCost: km * state.settings.fuelCons / 100 * state.settings.fuelPrice
+        fuelCost: km * getFuelSettingsForDate(rows[i].date).fuelCons / 100 * getFuelSettingsForDate(rows[i].date).fuelPrice
       });
     }
   }
@@ -322,7 +354,13 @@ statsCards.innerHTML=[stat("Coût total",euro(total)),stat("Coût année",euro(y
 let kmIntervals=intervals.reduce((s,x)=>s+x.km,0);
 let therm=intervals.reduce((s,x)=>s+x.fuelCost,0);
 let elecForCompare=total;
-fuelBox.innerHTML=kmIntervals?`<div class="grid grid4">${stat("Km calculés",kmIntervals+" km")}${stat("Coût électrique",euro(elecForCompare))}${stat("Essence estimée",euro(therm))}${stat("Économie estimée",euro(therm-elecForCompare))}</div><p class="muted">Calcul essence par intervalle : à chaque relevé, distance = kilométrage actuel − kilométrage précédent. Puis distance × ${state.settings.fuelCons} L/100 km ÷ 100 × ${state.settings.fuelPrice} €/L. Si tu oublies un jour, les kilomètres sont simplement regroupés au relevé suivant.</p>`:`<div class="notice">Ajoute au moins deux relevés avec kilométrage pour estimer le coût essence.</div>`;
+fuelBox.innerHTML=kmIntervals?`<div class="grid grid4">${stat("Km calculés",kmIntervals+" km")}${stat("Coût électrique",euro(elecForCompare))}${stat("Essence estimée",euro(therm))}${stat("Économie estimée",euro(therm-elecForCompare))}</div><p class="muted">Calcul essence par intervalle : à chaque relevé, distance = kilométrage actuel − kilométrage précédent. L'application utilise le prix du carburant actif à la date du relevé. Si tu changes le prix aujourd'hui, les anciens calculs gardent l'ancien prix.</p>`:`<div class="notice">Ajoute au moins deux relevés avec kilométrage pour estimer le coût essence.</div>`;
+
+  if(document.getElementById("fuelHistoryTable")){
+    const hist=(state.settings.fuelHistory||[]).slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+    fuelHistoryTable.innerHTML = hist.length ? "<tr><th>Date d'effet</th><th>Prix carburant</th><th>Conso thermique</th></tr>" + hist.map(h=>`<tr><td>${h.date==="0000-01-01" ? "Avant changement" : fr(h.date)}</td><td>${n(h.fuelPrice).toFixed(2)} €/L</td><td>${n(h.fuelCons)} L/100</td></tr>`).join("") : "";
+  }
+
 distanceTable.innerHTML="<tr><th>Date</th><th>Km précédent</th><th>Km actuel</th><th>Distance</th><th>Essence estimée</th></tr>"+intervals.slice().reverse().map(x=>`<tr><td>${fr(x.date)}</td><td>${x.prevOdo} km</td><td>${x.odo} km</td><td><b>${x.km} km</b></td><td>${euro(x.fuelCost)}</td></tr>`).join("");
 let estElec=buildEstimatedElectricFromKm();
 let estElecTotal=estElec.reduce((s,x)=>s+x.cost,0);
@@ -335,7 +373,7 @@ function renderHistory(){readingsTable.innerHTML="<tr><th>Date</th><th>Moment</t
 chargesTable.innerHTML="<tr><th>Date</th><th>Avant</th><th>Après</th><th>+%</th><th>kWh</th><th>HC</th><th>HP</th><th>Coût</th><th></th></tr>"+[...state.charges].sort((a,b)=>b.date.localeCompare(a.date)).map(c=>`<tr><td>${fr(c.date)}</td><td>${c.before}%</td><td>${c.after}%</td><td>+${pct(c.addedPct)}%</td><td>${pct(c.kwh)}</td><td>${pct(c.hcKwh)}</td><td>${pct(c.hpKwh)}</td><td><b>${euro(c.cost)}</b></td><td><button class="danger" onclick="delC('${c.id}')">Suppr.</button></td></tr>`).join("")}
 function delR(id){if(confirm("Supprimer ?")){state.readings=state.readings.filter(x=>x.id!==id);save()}}function delC(id){if(confirm("Supprimer ?")){state.charges=state.charges.filter(x=>x.id!==id);save()}}
 function renderSettings(){p_bat.value=state.settings.batteryKwh;p_hc.value=state.settings.hcPrice;p_hp.value=state.settings.hpPrice;p_hcStart.value=state.settings.hcStart;p_hcEnd.value=state.settings.hcEnd;p_power.value=state.settings.chargePowerKw;p_habitStart.value=state.settings.habitualStart||"22:10";p_habitEnd.value=state.settings.habitualEnd||"06:00";p_fuelPrice.value=state.settings.fuelPrice;p_fuelCons.value=state.settings.fuelCons;p_evPct100.value=state.settings.evPctPer100km||20;p_sched.checked=!!state.settings.scheduledAllHC}
-function saveSettings(){state.settings={batteryKwh:n(p_bat.value),hcPrice:n(p_hc.value),hpPrice:n(p_hp.value),hcStart:p_hcStart.value,hcEnd:p_hcEnd.value,chargePowerKw:n(p_power.value),fuelPrice:n(p_fuelPrice.value),fuelCons:n(p_fuelCons.value),habitualStart:p_habitStart.value,habitualEnd:p_habitEnd.value,evPctPer100km:n(p_evPct100.value)||20,scheduledAllHC:p_sched.checked};save();alert("Paramètres sauvegardés.")}
+function saveSettings(){updateFuelHistoryIfNeeded(n(p_fuelPrice.value), n(p_fuelCons.value));state.settings={batteryKwh:n(p_bat.value),hcPrice:n(p_hc.value),hpPrice:n(p_hp.value),hcStart:p_hcStart.value,hcEnd:p_hcEnd.value,chargePowerKw:n(p_power.value),fuelPrice:n(p_fuelPrice.value),fuelCons:n(p_fuelCons.value),fuelHistory:state.settings.fuelHistory||[],habitualStart:p_habitStart.value,habitualEnd:p_habitEnd.value,evPctPer100km:n(p_evPct100.value)||20,scheduledAllHC:p_sched.checked};save();alert("Paramètres sauvegardés.")}
 function resetSettings(){state.settings={...DEF};save()}
 function exportJSON(){download(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),"suivi-ve-" + new Date().toISOString().slice(0,10) + ".json")}
 function importJSON(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let o=JSON.parse(r.result);if(!o.settings||!o.readings||!o.charges)throw Error();state=o;save();alert("Import réussi.")}catch{alert("Fichier invalide.")}};r.readAsText(f)}
